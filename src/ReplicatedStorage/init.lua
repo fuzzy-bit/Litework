@@ -20,7 +20,24 @@ local LiteworkServer = require(script.LoadServer)
 
 
 
+--PUBLIC VARIABLES--
+Litework.Version = "0.1.1-alpha" -- FOLLOWS SEMVER
+
+
+
 --PRIVATE FUNCTIONS--
+local function MergeDictionaries(...)
+	local Result = {}
+
+	for i, Dictionary in pairs({...}) do
+		for Index, Value in pairs(Dictionary) do
+			Result[Index] = Value
+		end
+	end
+
+	return Result
+end
+
 local function GetServerComponents()
 	if LiteworkServer then
 		return LiteworkServer.ServerComponents
@@ -62,7 +79,6 @@ end
 
 local function LoadOrderedModules(Modules: {}, PriorityList: {}): {}
 	local OrderedModules = Modules
-	print(Modules)
 	
 	for i, Module in pairs(OrderedModules) do
 		local PrioritySearchResult = table.find(PriorityList, Module.Name)
@@ -72,8 +88,6 @@ local function LoadOrderedModules(Modules: {}, PriorityList: {}): {}
 		end
 	end
 
-	print(Modules)
-
 	return OrderedModules
 end
 
@@ -82,17 +96,12 @@ local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 	local AllModules = GetModules(ModuleContainer)
 
 	if PriorityList then
-		local OrderedModules = LoadOrderedModules(AllModules, PriorityList)
+		AllModules = LoadOrderedModules(AllModules, PriorityList)
+	end
 
-		for i, ModulePointer in pairs(OrderedModules) do
-			LoadedModules[ModulePointer.Name] = require(ModulePointer)
-			InitializeModule(LoadedModules[ModulePointer.Name])
-		end
-	else
-		for i, ModulePointer in pairs(AllModules) do
-			LoadedModules[ModulePointer.Name] = require(ModulePointer)
-			InitializeModule(LoadedModules[ModulePointer.Name])
-		end
+	for i, ModulePointer in pairs(AllModules) do
+		LoadedModules[ModulePointer.Name] = require(ModulePointer)
+		InitializeModule(LoadedModules[ModulePointer.Name])
 	end
 
 	return LoadedModules
@@ -117,10 +126,10 @@ function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
 	local LoadedModules = LoadModules(ModuleContainer, PriorityList)
 
 	shared.Modules = LockMetatable(LoadedModules)
-	shared.Components = LockMetatable({
-		unpack(SharedComponents),
-		unpack(GetServerComponents())
-	})
+	shared.Components = LockMetatable(MergeDictionaries(
+		SharedComponents,
+		GetServerComponents()
+	))
 
 	shared.GetModule = SharedFunctions.GetModule
 	shared.GetComponent = SharedFunctions.GetComponent
