@@ -1,14 +1,14 @@
 --DEFINE MODULE--
-local Components = {}
+local SharedComponents = {}
 
 
 
 --INIT--
 for i, Component in pairs(script:GetChildren()) do
-	Components[Component.Name] = require(Component)
+	SharedComponents[Component.Name] = require(Component)
 end
 
 
 
 --RETURN MODULE--
-return Components
+return SharedComponents

@@ -1,4 +1,12 @@
---RETURN MODULE--
-return { -- TODO: make this return a table with a bunch of server-exclusive framework components
+--DEFINE MODULE--
+local LiteworkServer = {}
 
-}
+
+
+--SUBMODULES--
+LiteworkServer.ServerComponents = require(script.ServerComponents)
+
+
+
+--RETURN MODULE--
+return LiteworkServer
