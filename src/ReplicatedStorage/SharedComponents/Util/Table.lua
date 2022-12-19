@@ -4,7 +4,7 @@ local Table = {}
 
 
 --PUBLIC FUNCTIONS--
-function Table:Shuffle(InputTable)
+function Table.Shuffle(InputTable)
 	local OutputTable = {}
 
 	for Key = #InputTable, 1, -1 do
@@ -17,7 +17,7 @@ function Table:Shuffle(InputTable)
 	return OutputTable
 end
 
-function Table:DeepCopy(Input)
+function Table.DeepCopy(Input)
 	local Copy = {}
 	
 	for Key, Value in pairs(Input) do
@@ -31,7 +31,7 @@ function Table:DeepCopy(Input)
 	return Copy
 end
 
-function Table:Reconcile(Target, Template)
+function Table.Reconcile(Target, Template)
 	for Key, Value in pairs(Template) do
 		if type(Key) == "string" then -- Only string keys will be reconciled
 			if Target[Key] == nil then
@@ -47,7 +47,7 @@ function Table:Reconcile(Target, Template)
 	end
 end
 
-function Table:Merge(...)
+function Table.Merge(...)
 	local Result = {}
 	
 	for i, TableToMerge in ipairs({...}) do
@@ -58,6 +58,18 @@ function Table:Merge(...)
 		end
 	end
 	
+	return Result
+end
+
+function Table.MergeDictionaries(...)
+	local Result = {}
+
+	for i, Dictionary in pairs({...}) do
+		for Index, Value in pairs(Dictionary) do
+			Result[Index] = Value
+		end
+	end
+
 	return Result
 end
 

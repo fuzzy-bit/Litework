@@ -111,7 +111,7 @@ end
 
 --PUBLIC FUNCTIONS--
 --[=[
-	:::danger Do not run this function more than once!
+	:::danger Only run this function once!
 	This function should only be ran on both the server and client once, not doing so will most likely cause errors.
 	:::
 

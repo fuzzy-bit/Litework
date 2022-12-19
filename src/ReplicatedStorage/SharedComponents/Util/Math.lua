@@ -4,11 +4,11 @@ local Math = {}
 
 
 --PUBLIC FUNCTIONS--
-function Math:Lerp(A, B, T) 
+function Math.Lerp(A, B, T) 
 	return A * (1 - T) + B * T
 end
 
-function Math:Median(Numbers)
+function Math.Median(Numbers)
 	if type(Numbers) ~= "table" then return Numbers end
 	
 	table.sort(Numbers)
@@ -19,7 +19,7 @@ function Math:Median(Numbers)
 	return Numbers[math.ceil(#Numbers / 2)]
 end
 
-function Math:SecondsToFrames(Seconds, FPS)
+function Math.SecondsToFrames(Seconds, FPS)
 	if not FPS then
 		FPS = 60
 	end
