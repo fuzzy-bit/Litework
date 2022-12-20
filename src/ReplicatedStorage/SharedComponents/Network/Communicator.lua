@@ -11,6 +11,11 @@ local ServerStorage = game:GetService("ServerStorage")
 
 
 
+--MODULES--
+local Signal = shared.GetVendorComponent("Signal")
+
+
+
 --PRIVATE VARIABLES--
 local InstanceLocation = game.ReplicatedStorage
 local ServerBindableLocation = ServerStorage

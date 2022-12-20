@@ -4,7 +4,8 @@ local LiteworkServer = {}
 
 
 --SUBMODULES--
-LiteworkServer.ServerComponents = require(script.ServerComponents)
+LiteworkServer.Components = require(script.ServerComponents)
+LiteworkServer.Vendor = require(script.ServerComponents)
 
 
 

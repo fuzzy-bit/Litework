@@ -3,9 +3,13 @@ local SharedComponents = {}
 
 
 
---INIT--
-for i, Component in pairs(script:GetChildren()) do
-	SharedComponents[Component.Name] = require(Component)
+--PUBLIC FUNCTIONS--
+function SharedComponents:Load()
+	for i, Component in pairs(script:GetChildren()) do
+		SharedComponents[Component.Name] = require(Component)
+	end
+
+	SharedComponents.Load = nil
 end
 
 

@@ -44,6 +44,20 @@ function SharedFunctions.GetComponent(ComponentName)
 	))
 end
 
+function SharedFunctions.GetVendorComponent(VendorComponentName)
+	if shared.VendorComponents then
+		if shared.VendorComponents[VendorComponentName] then
+			return shared.VendorComponents[VendorComponentName]
+		end
+	end
+
+	error(string.format(
+		"Unable to load vendor component: Could not find component named \"%s\"! %s",
+		VendorComponentName,
+		RunService:IsClient() and "Is it a server-only vendor component?" or ""
+	))
+end
+
 
 
 --RETURN MODULE--

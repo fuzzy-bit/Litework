@@ -16,12 +16,13 @@ local RunService = game:GetService("RunService")
 --MODULES--
 local SharedFunctions = require(script.SharedFunctions)
 local SharedComponents = require(script.SharedComponents)
+local SharedVendorComponents = require(script.Vendor)
 local LiteworkServer = require(script.LoadServer)
 
 
 
 --PUBLIC VARIABLES--
-Litework.Version = "0.1.1-alpha" -- FOLLOWS SEMVER
+Litework.Version = "0.1.2-alpha" -- FOLLOWS SEMVER
 
 
 
@@ -38,9 +39,9 @@ local function MergeDictionaries(...)
 	return Result
 end
 
-local function GetServerComponents()
+local function GetFromServer(Index)
 	if LiteworkServer then
-		return LiteworkServer.ServerComponents
+		return LiteworkServer[Index]
 	end
 
 	return {}
@@ -123,16 +124,24 @@ end
 	@param PriorityList {}? -- A table containing names (strings) of modules to load in order.
 ]=]
 function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
-	local LoadedModules = LoadModules(ModuleContainer, PriorityList)
+	local LoadedModules
+
+	shared.GetModule = SharedFunctions.GetModule
+	shared.GetComponent = SharedFunctions.GetComponent
+	shared.GetVendorComponent = SharedFunctions.GetVendorComponent
+	shared.VendorComponents = LockMetatable(MergeDictionaries(
+		SharedVendorComponents,
+		GetFromServer("Vendor")
+	))
+
+	LoadedModules = LoadModules(ModuleContainer, PriorityList)
+	SharedComponents:Load()
 
 	shared.Modules = LockMetatable(LoadedModules)
 	shared.Components = LockMetatable(MergeDictionaries(
 		SharedComponents,
-		GetServerComponents()
+		GetFromServer("Components")
 	))
-
-	shared.GetModule = SharedFunctions.GetModule
-	shared.GetComponent = SharedFunctions.GetComponent
 end
 
 
