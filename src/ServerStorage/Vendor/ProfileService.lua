@@ -2,7 +2,7 @@
 --[[
 {Madwork}
 
--[ProfileService]---------------------------------------
+-[ProfileService]------------------
 	(STANDALONE VERSION)
 	DataStore profiles - universal session-locked savable table API
 	
@@ -373,7 +373,7 @@ do
 
 end
 
------ Service Table -----
+-- Service Table --
 
 local ProfileService = {
 
@@ -441,7 +441,7 @@ local ProfileService = {
 	}
 --]]
 
------ Private Variables -----
+-- Private Variables --
 
 local ActiveProfileStores = ProfileService._active_profile_stores
 local AutoSaveList = ProfileService._auto_save_list
@@ -486,7 +486,7 @@ local CustomWriteQueue = {
 	--]]
 }
 
------ Utils -----
+-- Utils --
 
 local function DeepCopyTable(t)
 	local copy = {}
@@ -516,7 +516,7 @@ local function ReconcileTable(target, template)
 	end
 end
 
------ Private functions -----
+-- Private functions --
 
 local function IdentifyProfile(store_name, store_scope, key)
 	return string.format(
@@ -1105,7 +1105,7 @@ local function SaveProfileAsync(profile, release_from_session, is_overwriting)
 	ActiveProfileSaveJobs = ActiveProfileSaveJobs - 1
 end
 
------ Public functions -----
+-- Public functions --
 
 -- GlobalUpdates object:
 
@@ -2279,7 +2279,7 @@ function ProfileService.IsLive() --> [bool] -- (CAN YIELD!!!)
 
 end
 
------ Initialize -----
+-- Initialize --
 
 if IsStudio == true then
 	IsLiveCheckActive = true
@@ -2307,7 +2307,7 @@ if IsStudio == true then
 	end)
 end
 
------ Connections -----
+-- Connections --
 
 -- Auto saving and issue queue managing:
 RunService.Heartbeat:Connect(function()

@@ -1,4 +1,8 @@
 --DEFINE MODULE--
+--[=[
+	Functions accessed via the `shared` global.
+	@class Globals
+]=]
 local SharedFunctions = {}
 
 
@@ -16,7 +20,19 @@ end
 
 
 --PUBLIC FUNCTIONS--
-function SharedFunctions.GetModule(ModuleName)
+--[=[
+	Returns a module loaded with [Litework:Load()]. Used instead of `require` for your preloaded modules.
+	For example:
+	```lua
+	local MyModule = shared.GetModule("MyModule")
+	MyModule:MyMethod()
+	```
+
+	@within Globals
+	@param ModuleName string
+	@return {}
+]=]
+function SharedFunctions.GetModule(ModuleName: string)
 	if shared.Modules then
 		if shared.Modules[ModuleName] then
 			return shared.Modules[ModuleName]
@@ -30,6 +46,17 @@ function SharedFunctions.GetModule(ModuleName)
 	))
 end
 
+--[=[
+	Returns a built-in [Litework] component, for example:
+	```lua
+	local Util = shared.GetComponent("Util")
+	Util.Math.Median({1, 2, 3}})
+	```
+
+	@within Globals
+	@param ComponentName string
+	@return {}
+]=]
 function SharedFunctions.GetComponent(ComponentName)
 	if shared.Components then
 		if shared.Components[ComponentName] then
@@ -44,6 +71,17 @@ function SharedFunctions.GetComponent(ComponentName)
 	))
 end
 
+--[=[
+	Returns a third-party component, for example:
+	```lua
+	local Signal = shared.GetComponent("Signal")
+	local NewSignal = Signal.new()
+	```
+
+	@within Globals
+	@param VendorComponentName string
+	@return {}
+]=]
 function SharedFunctions.GetVendorComponent(VendorComponentName)
 	if shared.VendorComponents then
 		if shared.VendorComponents[VendorComponentName] then

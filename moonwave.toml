@@ -1,0 +1,14 @@
+gitRepoUrl = "https://github.com/fuzzy-bit/Litework"
+gitSourceBranch = "master"
+
+
+[[classOrder]]
+classes = ["Globals", "Litework"]
+
+[[classOrder]]
+section = "Vendor"
+classes = ["VendorShared", "VendorServer", "Signal"]
+
+
+[docusaurus]
+tagline = "Modular & Lightweight Roblox Framework"
