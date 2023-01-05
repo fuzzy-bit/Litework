@@ -17,8 +17,8 @@ local Communicators = {
 
 
 --PUBLIC FUNCTIONS--
-function Network:GetCommunicator(Name: string, Mode: string, Channels: {}?)
-    return Network.Communicator.new(Name, Mode, Channels)
+function Network:GetCommunicator(Name: string, Mode: string, ChannelType: string, ChannelAmount: number?)
+    return Network.Communicator.new(Name, Mode, ChannelType, ChannelAmount)
 end
 
 

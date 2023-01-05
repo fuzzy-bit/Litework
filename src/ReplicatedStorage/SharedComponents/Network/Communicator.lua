@@ -32,16 +32,19 @@ local ChannelTypes = {
 
 
 --PUBLIC FUNCTIONS--
-function Communicator.new(Name: string, Mode: string, Channels: {}?)
+function Communicator.new(Name: string, Mode: string, ChannelType: string, ChannelAmount: number?)
     local self = setmetatable({
         Name = Name,
         Channels = {},
+        OnEvent = Signal.new(),
 
         RootFolder = nil
     }, Communicator)
 
-    local ModeFolder = InstanceLocation.Communicators:FindFirstChild(Mode)
+    local ChannelAmount = ChannelAmount or 1
 
+    local ModeFolder = InstanceLocation.Communicators:FindFirstChild(Mode)
+    
     if Mode == "Bindable" and RunService:IsServer() then
         ModeFolder = ServerBindableLocation.BindableCommunicators
     end
@@ -58,30 +61,20 @@ function Communicator.new(Name: string, Mode: string, Channels: {}?)
         self.RootFolder.Name = Name
         self.RootFolder.Parent = ModeFolder
 
-        Channels = Channels or {
-            ["Event"] = 1,
-            ["Function"] = 1
-        }
-
-        for ChannelType, Amount in pairs(Channels) do
+        for i = 1, ChannelAmount do
             if not ChannelTypes[ChannelType] then
+                print(ChannelType)
                 error(string.format(
                     "Invalid channel type \"%s\"!",
                     string.lower(ChannelType)
                 ))
             end
 
-            if not self.Channels[ChannelType] then
-                self.Channels[ChannelType] = {}
-            end
+            local ChannelObject = Instance.new(Mode .. ChannelType)
+            ChannelObject.Name = string.format("%s-Channel", ChannelType)
+            ChannelObject.Parent = self.RootFolder
 
-            for i = 1, Amount do
-                local ChannelObject = Instance.new(Mode .. ChannelType)
-                ChannelObject.Name = string.format("%s-Channel", ChannelType)
-                ChannelObject.Parent = self.RootFolder
-
-                table.insert(self.Channels[ChannelType], ChannelObject)
-            end
+            table.insert(self.Channels, ChannelObject)
         end
     else
         self.RootFolder = ModeFolder:FindFirstChild(Name)
@@ -97,15 +90,21 @@ function Communicator.new(Name: string, Mode: string, Channels: {}?)
                 ))
             end
 
-            if not self.Channels[ChannelType] then
-                self.Channels[ChannelType] = {}
-            end
-
-            table.insert(self.Channels[ChannelType], ChannelObject)
+            table.insert(self.Channels, ChannelObject)
         end
     end
 
     return self
+end
+
+function Communicator:FireRandom()
+    
+end
+
+function Communicator:Fire(...)
+    if self.Mode == "Bindable" then
+        
+    end
 end
 
 
