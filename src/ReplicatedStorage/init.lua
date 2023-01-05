@@ -113,7 +113,7 @@ end
 --PUBLIC FUNCTIONS--
 --[=[
 	:::danger Only run this function once!
-	This function should only be ran on both the server and client once, not doing so will most likely cause errors.
+	This function should only be run on both the server and client once, not doing so will most likely cause errors.
 	:::
 
 	Loads the framework with an instance containing modules, and folders to group them. Each module is required in the order of the PriorityList, and runs an :Init() function given the module contains one. 

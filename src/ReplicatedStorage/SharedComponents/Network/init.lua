@@ -16,23 +16,10 @@ local Communicators = {
 
 
 
---PRIVATE FUNCTIONS--
-local function GetExistingCommunicators(Mode: string)
-    
-end
-
-
-
 --PUBLIC FUNCTIONS--
 function Network:GetCommunicator(Name: string, Mode: string, Channels: {}?)
     return Network.Communicator.new(Name, Mode, Channels)
 end
-
-
-
---INIT--
-GetExistingCommunicators("Remote")
-GetExistingCommunicators("Bindable")
 
 
 
