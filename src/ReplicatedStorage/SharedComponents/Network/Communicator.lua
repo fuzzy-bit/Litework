@@ -20,6 +20,8 @@ local Signal = shared.GetVendorComponent("Signal")
 local InstanceLocation = game.ReplicatedStorage
 local ServerBindableLocation = ServerStorage
 
+local Randomizer = Random.new(tick())
+
 local Modes = {
     ["Remote"] = "Remote",
     ["Bindable"] = "Bindable"
@@ -29,20 +31,45 @@ local ChannelTypes = {
     ["Function"] = "Function"
 }
 
+local FireFunctionNames = {
+    ["Remote"] = {
+        ["Event"] = "FireServer",
+        ["Function"] = "InvokeServer"
+    },
+    ["Bindable"] = {
+        ["Event"] = "Fire",
+        ["Function"] = "Invoke"
+    }
+}
+local EventNames = {
+    ["Remote"] = {
+        ["Event"] = "On%sEvent",
+        ["Function"] = "On%sInvoke"
+    },
+    ["Bindable"] = {
+        ["Event"] = "Event",
+        ["Function"] = "OnInvoke"
+    }
+}
+
 
 
 --PUBLIC FUNCTIONS--
 function Communicator.new(Name: string, Mode: string, ChannelType: string, ChannelAmount: number?)
     local self = setmetatable({
         Name = Name,
+        Mode = Mode,
+        Type = ChannelType,
+
         Channels = {},
         OnEvent = Signal.new(),
 
         RootFolder = nil
     }, Communicator)
 
-    local ChannelAmount = ChannelAmount or 1
+    local ContextString = RunService:IsServer() and "Server" or "Client"
 
+    local ChannelAmount = ChannelAmount or 1
     local ModeFolder = InstanceLocation.Communicators:FindFirstChild(Mode)
     
     if Mode == "Bindable" and RunService:IsServer() then
@@ -56,54 +83,65 @@ function Communicator.new(Name: string, Mode: string, ChannelType: string, Chann
         ))
     end
 
-    if not ModeFolder:FindFirstChild(Name) then
-        self.RootFolder = Instance.new("Folder")
-        self.RootFolder.Name = Name
-        self.RootFolder.Parent = ModeFolder
+    self:SetupChannels(ChannelAmount, ModeFolder)
 
-        for i = 1, ChannelAmount do
-            if not ChannelTypes[ChannelType] then
-                print(ChannelType)
-                error(string.format(
-                    "Invalid channel type \"%s\"!",
-                    string.lower(ChannelType)
-                ))
-            end
+    for i, ChannelObject in pairs(self.RootFolder:GetChildren()) do
+        local EventName = EventNames[Mode][self.Type]
+        local ContextualizedEventName = EventName
 
-            local ChannelObject = Instance.new(Mode .. ChannelType)
-            ChannelObject.Name = string.format("%s-Channel", ChannelType)
-            ChannelObject.Parent = self.RootFolder
-
-            table.insert(self.Channels, ChannelObject)
+        if Mode == "Remote" then
+            ContextualizedEventName = string.format(EventName, ContextString)
         end
-    else
-        self.RootFolder = ModeFolder:FindFirstChild(Name)
 
-        for i, ChannelObject in pairs(self.RootFolder:GetChildren()) do
-            local SplitName = string.split(ChannelObject.Name, "-")
-            local ChannelType = SplitName[1]
-
-            if not ChannelTypes[ChannelType] then
-                error(string.format(
-                    "Invalid channel type \"%s\"!",
-                    string.lower(ChannelType)
-                ))
-            end
-
-            table.insert(self.Channels, ChannelObject)
-        end
+        ChannelObject[ContextualizedEventName]:Connect(function(...)
+            self.OnEvent:Fire(...)
+        end)
     end
 
     return self
 end
 
-function Communicator:FireRandom()
-    
+function Communicator:FireServer(...)
+    local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+    self.Channels[ChannelId]:FireServer(...)
 end
 
-function Communicator:Fire(...)
-    if self.Mode == "Bindable" then
-        
+function Communicator:SetupChannels(ChannelAmount: number, ModeFolder: Instance)
+    if not ModeFolder:FindFirstChild(self.Name) then
+        self.RootFolder = Instance.new("Folder")
+        self.RootFolder.Name = self.Name
+        self.RootFolder.Parent = ModeFolder
+
+        if not ChannelTypes[self.Type] then
+            error(string.format(
+                "Invalid channel type \"%s\"!",
+                string.lower(self.Type)
+            ))
+        end
+
+        for i = 1, ChannelAmount do
+            local ChannelObject = Instance.new(self.Mode .. self.Type)
+            ChannelObject.Name = string.format("%s-Channel", self.Type)
+            ChannelObject.Parent = self.RootFolder
+
+            table.insert(self.Channels, ChannelObject)
+        end
+    else
+        self.RootFolder = ModeFolder:FindFirstChild(self.Name)
+
+        for i, ChannelObject in pairs(self.RootFolder:GetChildren()) do
+            local SplitName = string.split(ChannelObject.Name, "-")
+            self.Type = SplitName[1]
+
+            if not ChannelTypes[self.Type] then
+                error(string.format(
+                    "Invalid channel type \"%s\"!",
+                    string.lower(self.Type)
+                ))
+            end
+
+            table.insert(self.Channels, ChannelObject)
+        end
     end
 end
 
