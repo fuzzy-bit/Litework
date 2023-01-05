@@ -21,6 +21,14 @@ local InstanceLocation = game.ReplicatedStorage
 local ServerBindableLocation = ServerStorage
 
 local Randomizer = Random.new(tick())
+local ContextString = RunService:IsServer() and "Server" or "Client"
+
+local Errors = {
+    InvalidMode = "Invalid mode \"%s\"!",
+    InvalidChannel = "Invalid channel type \"%s\"!",
+    ServerFromClient = "Attempt to call client-only method from server!",
+    ClientFromServer = "Attempt to call server-only method from client!"
+}
 
 local Modes = {
     ["Remote"] = "Remote",
@@ -67,54 +75,109 @@ function Communicator.new(Name: string, Mode: string, ChannelType: string, Chann
         RootFolder = nil
     }, Communicator)
 
-    local ContextString = RunService:IsServer() and "Server" or "Client"
-
     local ChannelAmount = ChannelAmount or 1
     local ModeFolder = InstanceLocation.Communicators:FindFirstChild(Mode)
-    
+
     if Mode == "Bindable" and RunService:IsServer() then
         ModeFolder = ServerBindableLocation.BindableCommunicators
     end
 
     if not ModeFolder then
         error(string.format(
-            "Invalid mode \"%s\"!",
+            Errors.InvalidMode,
             string.lower(Mode)
         ))
     end
 
     self:SetupChannels(ChannelAmount, ModeFolder)
-
-    for i, ChannelObject in pairs(self.RootFolder:GetChildren()) do
-        local EventName = EventNames[Mode][self.Type]
-        local ContextualizedEventName = EventName
-
-        if Mode == "Remote" then
-            ContextualizedEventName = string.format(EventName, ContextString)
-        end
-
-        ChannelObject[ContextualizedEventName]:Connect(function(...)
-            self.OnEvent:Fire(...)
-        end)
-    end
+    self:UpdateChannels()
 
     return self
 end
 
+-- RemoteEvent
+function Communicator:FireAllClients(...)
+    if RunService:IsServer() then   
+        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+        self.Channels[ChannelId]:FireAllClients(...)
+    else
+        error(Errors.ServerFromClient)
+    end
+end
+
+function Communicator:FireClient(Player: Player, ...)
+    if RunService:IsServer() then   
+        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+        self.Channels[ChannelId]:FireClient(Player, ...)
+    else
+        error(Errors.ServerFromClient)
+    end
+end
+
 function Communicator:FireServer(...)
+    if RunService:IsClient() then   
+        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+        self.Channels[ChannelId]:FireServer(...)
+    else
+        error(Errors.ClientFromServer)
+    end
+end
+
+-- BindableEvent
+function Communicator:Fire(...)
     local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-    self.Channels[ChannelId]:FireServer(...)
+    self.Channels[ChannelId]:Fire(...)
+end
+
+--RemoteFunction
+function Communicator:InvokeServer(...)
+    if RunService:IsClient() then
+        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+        return self.Channels[ChannelId]:InvokeServer(...)
+    else
+        error(Errors.ClientFromServer)
+    end
+end
+
+function Communicator:InvokeClient(...)
+    if RunService:IsServer() then
+        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+        return self.Channels[ChannelId]:InvokeClient(...)
+    else
+        error(Errors.ServerFromClient)
+    end
+end
+
+-- BindableFunction
+function Communicator:Invoke(...)
+    local ChannelId = Randomizer:NextInteger(1, #self.Channels)
+    return self.Channels[ChannelId]:Invoke(...)
+end
+
+function Communicator:OnInvoke(InvokeFunction)
+    for i, ChannelObject in pairs(self.RootFolder:GetChildren()) do
+        local EventName = EventNames[self.Mode][self.Type]
+        local ContextualizedEventName = EventName
+
+        if self.Mode == "Remote" then
+            ContextualizedEventName = string.format(EventName, ContextString)
+        end
+
+        if self.Type == "Function" then
+            ChannelObject[ContextualizedEventName] = InvokeFunction
+        end
+    end
 end
 
 function Communicator:SetupChannels(ChannelAmount: number, ModeFolder: Instance)
-    if not ModeFolder:FindFirstChild(self.Name) then
+    if not ModeFolder:WaitForChild(self.Name, 3) then
         self.RootFolder = Instance.new("Folder")
         self.RootFolder.Name = self.Name
         self.RootFolder.Parent = ModeFolder
 
         if not ChannelTypes[self.Type] then
             error(string.format(
-                "Invalid channel type \"%s\"!",
+                Errors.InvalidChannel,
                 string.lower(self.Type)
             ))
         end
@@ -135,12 +198,31 @@ function Communicator:SetupChannels(ChannelAmount: number, ModeFolder: Instance)
 
             if not ChannelTypes[self.Type] then
                 error(string.format(
-                    "Invalid channel type \"%s\"!",
+                    Errors.InvalidChannel,
                     string.lower(self.Type)
                 ))
             end
 
             table.insert(self.Channels, ChannelObject)
+        end
+    end
+end
+
+function Communicator:UpdateChannels()
+    for i, ChannelObject in pairs(self.RootFolder:GetChildren()) do
+        local EventName = EventNames[self.Mode][self.Type]
+        local ContextualizedEventName = EventName
+
+        if self.Mode == "Remote" then
+            ContextualizedEventName = string.format(EventName, ContextString)
+        end
+
+        if self.Type == "Event" then
+            ChannelObject[ContextualizedEventName]:Connect(function(...)
+                self.OnEvent:Fire(...)
+            end)
+        elseif self.Type == "Function" then
+            ChannelObject[ContextualizedEventName] = self.OnEvent
         end
     end
 end

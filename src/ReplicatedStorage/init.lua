@@ -22,7 +22,7 @@ local LiteworkServer = require(script.LoadServer)
 
 
 --PUBLIC VARIABLES--
-Litework.Version = "0.1.2-alpha" -- FOLLOWS SEMVER
+Litework.Version = "0.1.3-alpha" -- FOLLOWS SEMVER
 
 
 
