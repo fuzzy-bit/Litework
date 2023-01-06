@@ -5,11 +5,14 @@ local SharedComponents = {}
 
 --PUBLIC FUNCTIONS--
 function SharedComponents:Load()
+	local LoadedComponents = {}
+
 	for i, Component in pairs(script:GetChildren()) do
-		SharedComponents[Component.Name] = require(Component)
+		LoadedComponents[Component.Name] = require(Component)
 	end
 
 	SharedComponents.Load = nil
+	return LoadedComponents
 end
 
 

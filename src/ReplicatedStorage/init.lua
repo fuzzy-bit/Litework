@@ -125,6 +125,7 @@ end
 ]=]
 function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
 	local LoadedModules
+	local LoadedComponents
 
 	shared.GetModule = SharedFunctions.GetModule
 	shared.GetComponent = SharedFunctions.GetComponent
@@ -134,14 +135,15 @@ function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
 		GetFromServer("Vendor")
 	))
 
-	LoadedModules = LoadModules(ModuleContainer, PriorityList)
-	SharedComponents:Load()
+	LoadedComponents = SharedComponents:Load()
 
-	shared.Modules = LockMetatable(LoadedModules)
 	shared.Components = LockMetatable(MergeDictionaries(
-		SharedComponents,
+		LoadedComponents,
 		GetFromServer("Components")
 	))
+
+	LoadedModules = LoadModules(ModuleContainer, PriorityList)
+	shared.Modules = LockMetatable(LoadedModules)
 end
 
 
