@@ -1,10 +1,16 @@
 --DEFINE MODULE--
+--[=[
+    TODO: Document the Network component and the Communicator class.
+
+    @class Network
+]=]
 local Network = {}
 
 
 
 --SUBMODULES--
 Network.Communicator = require(script.Communicator)
+Network.LZ4 = require(script.LZ4)
 
 
 

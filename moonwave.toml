@@ -3,7 +3,11 @@ gitSourceBranch = "master"
 
 
 [[classOrder]]
-classes = ["Globals", "Litework"]
+classes = ["Litework", "Globals"]
+
+[[classOrder]]
+section = "Network"
+classes = ["Network", "Communicator", "LZ4"]
 
 [[classOrder]]
 section = "Vendor"

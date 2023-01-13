@@ -1,4 +1,9 @@
 --DEFINE MODULE--
+--[=[
+    Wrapper for event objects.
+
+    @class Communicator
+]=]
 local Communicator = {}
 Communicator.__index = Communicator
 
