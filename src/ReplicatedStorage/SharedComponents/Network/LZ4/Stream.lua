@@ -3,8 +3,13 @@ local Stream = {} -- TODO: use tables rather than strings
 
 
 
+--SUBMODULES--
+Stream.DataConverter = require(script.Parent.DataConverter)
+
+
+
 --PUBLIC FUNCTIONS--
-function Stream.new(Source: string)
+function Stream.new(Source: {})
     local self = setmetatable({
         Offset = 0,
         Source = Source,
@@ -40,8 +45,17 @@ function Stream:Seek(Length: number?)
     self.Finished = self.Offset >= self.Length
 end
 
-function Stream:Append(NewData: string)
-    self.Source ..= NewData
+function Stream:Append(NewData: any)
+    local Converted = Stream.DataConverter:Convert(NewData)
+
+    for i, Byte in pairs(Converted) do
+        if Byte > 0xFF and type(NewData) ~= "number" then
+            error("Stream recieved non-byte data!")
+        end
+
+        table.insert(self.Source, Byte)
+    end
+
     self.Length = #self.Source
     self:Seek(0)
 end
