@@ -10,7 +10,6 @@ local Network = {}
 
 --SUBMODULES--
 Network.Communicator = require(script.Communicator)
-Network.LZ4 = require(script.LZ4)
 
 
 

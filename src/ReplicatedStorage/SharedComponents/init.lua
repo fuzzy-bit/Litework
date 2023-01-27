@@ -3,6 +3,13 @@ local SharedComponents = {}
 
 
 
+--PRIVATE FUNCTIONS--
+local function AfterLoad()
+	return "This function can only be used once per require."
+end
+
+
+
 --PUBLIC FUNCTIONS--
 function SharedComponents:Load()
 	local LoadedComponents = {}
@@ -11,7 +18,7 @@ function SharedComponents:Load()
 		LoadedComponents[Component.Name] = require(Component)
 	end
 
-	SharedComponents.Load = nil
+	SharedComponents.Load = AfterLoad -- self-destruct for safety
 	return LoadedComponents
 end
 

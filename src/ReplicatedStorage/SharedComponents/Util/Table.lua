@@ -22,7 +22,7 @@ function Table.DeepCopy(Input)
 	
 	for Key, Value in pairs(Input) do
 		if type(Value) == "table" then
-			Copy[Key] = Table:DeepCopy(Value)
+			Copy[Key] = Table.DeepCopy(Value)
 		else
 			Copy[Key] = Value
 		end
@@ -36,12 +36,12 @@ function Table.Reconcile(Target, Template)
 		if type(Key) == "string" then -- Only string keys will be reconciled
 			if Target[Key] == nil then
 				if type(Value) == "table" then
-					Target[Key] = Table:DeepCopy(Value)
+					Target[Key] = Table.DeepCopy(Value)
 				else
 					Target[Key] = Value
 				end
 			elseif type(Target[Key]) == "table" and type(Value) == "table" then
-				Table:Reconcile(Target[Key], Value)
+				Table.Reconcile(Target[Key], Value)
 			end
 		end
 	end
