@@ -57,7 +57,9 @@ end
 local function InitializeModule(Module)
 	if Module["Init"] then
 		if type(Module["Init"]) == "function" then
-			Module:Init()
+			task.spawn(function()
+				Module:Init()
+			end)
 		end
 	end
 end
