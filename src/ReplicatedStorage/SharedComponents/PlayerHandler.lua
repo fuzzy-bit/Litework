@@ -13,7 +13,7 @@
 	To toggle built-in behavior, you can use `PlayerHandler:SetFlag(FlagName, Value)`.
 
 	Some uses include:
-	```
+	```lua
 	PlayerHandler:Init() -- Running more than once does absolutely nothing
 	PlayerHandler:SetFlag("CharacterAutoLoads", true) -- Default: false. Disables custom RespawnTime and character handling
 	PlayerHandler:SetFlag("RespawnTime", 1) -- Default: 5

@@ -57,9 +57,7 @@ end
 local function InitializeModule(Module)
 	if Module["Init"] then
 		if type(Module["Init"]) == "function" then
-			task.spawn(function()
-				Module:Init()
-			end)
+			Module:Init()
 		end
 	end
 end
@@ -103,8 +101,10 @@ local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 	end
 
 	for i, ModulePointer in pairs(AllModules) do
-		LoadedModules[ModulePointer.Name] = require(ModulePointer)
-		InitializeModule(LoadedModules[ModulePointer.Name])
+		task.spawn(function()
+			LoadedModules[ModulePointer.Name] = require(ModulePointer)
+			InitializeModule(LoadedModules[ModulePointer.Name])
+		end)
 	end
 
 	return LoadedModules
@@ -116,6 +116,10 @@ end
 --[=[
 	:::danger Only run this function once!
 	This function should only be run on both the server and client once, not doing so will most likely cause errors.
+	:::
+
+	:::danger Only yield when you need to!
+	The call to the initialization function will be delayed if you run anything that yields outside of your :Init().
 	:::
 
 	Loads the framework with an instance containing modules, and folders to group them. Each module is required in the order of the PriorityList, and runs an :Init() function given the module contains one. 

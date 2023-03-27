@@ -7,7 +7,7 @@ classes = ["Litework", "Globals"]
 
 [[classOrder]]
 section = "Network"
-classes = ["Network", "Communicator", "LZ4"]
+classes = ["Network", "Communicator"]
 
 [[classOrder]]
 section = "Vendor"
