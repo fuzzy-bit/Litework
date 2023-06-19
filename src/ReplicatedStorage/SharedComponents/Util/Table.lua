@@ -19,7 +19,7 @@ end
 
 function Table.DeepCopy(Input)
 	local Copy = {}
-	
+
 	for Key, Value in pairs(Input) do
 		if type(Value) == "table" then
 			Copy[Key] = Table.DeepCopy(Value)
@@ -27,7 +27,7 @@ function Table.DeepCopy(Input)
 			Copy[Key] = Value
 		end
 	end
-	
+
 	return Copy
 end
 
@@ -49,7 +49,7 @@ end
 
 function Table.Merge(...)
 	local Result = {}
-	
+
 	for i, TableToMerge in ipairs({...}) do
 		if type(TableToMerge) == "table" then
 			for Key, Value in pairs(TableToMerge) do
@@ -57,7 +57,7 @@ function Table.Merge(...)
 			end
 		end
 	end
-	
+
 	return Result
 end
 

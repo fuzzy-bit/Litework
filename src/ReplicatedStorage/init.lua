@@ -22,7 +22,7 @@ local LiteworkServer = require(script.LoadServer)
 
 
 --PUBLIC VARIABLES--
-Litework.Version = "0.1.3-alpha" -- FOLLOWS SEMVER
+Litework.Version = "0.1.4-alpha" -- FOLLOWS SEMVER
 
 
 
@@ -93,21 +93,21 @@ local function LoadOrderedModules(Modules: {}, PriorityList: {}): {}
 end
 
 local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
-	local LoadedModules = {}
 	local AllModules = GetModules(ModuleContainer)
-
+	shared.Modules = {}
+	
 	if PriorityList then
 		AllModules = LoadOrderedModules(AllModules, PriorityList)
 	end
 
 	for i, ModulePointer in pairs(AllModules) do
 		task.spawn(function()
-			LoadedModules[ModulePointer.Name] = require(ModulePointer)
-			InitializeModule(LoadedModules[ModulePointer.Name])
+			shared.Modules[ModulePointer.Name] = require(ModulePointer)
+			InitializeModule(shared.Modules[ModulePointer.Name])
 		end)
 	end
 
-	return LoadedModules
+	return shared.Modules
 end
 
 
@@ -148,8 +148,8 @@ function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
 		GetFromServer("Components")
 	))
 
-	LoadedModules = LoadModules(ModuleContainer, PriorityList)
-	shared.Modules = LockMetatable(LoadedModules)
+	LoadModules(ModuleContainer, PriorityList)
+	shared.Modules = LockMetatable(shared.Modules)
 end
 
 
