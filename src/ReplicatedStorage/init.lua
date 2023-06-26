@@ -93,9 +93,7 @@ local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 	shared.Modules = {}
 	
 	if PriorityList then
-		print(AllModules)
 		AllModules = LoadOrderedModules(AllModules, PriorityList)
-		print(AllModules)
 	end
 
 	for i, ModulePointer in pairs(AllModules) do
