@@ -68,10 +68,10 @@ local function GetModules(ModuleContainer: Instance): {}
 	for X, Child in pairs(ModuleContainer:GetChildren()) do
 		if Child:IsA("Folder") then
 			for Y, FolderChild in pairs(GetModules(Child)) do
-				table.insert(AllModules, FolderChild)
+				AllModules[FolderChild.Name] = FolderChild
 			end
 		elseif Child:IsA("ModuleScript") then
-			table.insert(AllModules, Child)
+			AllModules[Child.Name] = Child
 		end
 	end
 
@@ -79,14 +79,10 @@ local function GetModules(ModuleContainer: Instance): {}
 end
 
 local function LoadOrderedModules(Modules: {}, PriorityList: {}): {}
-	local OrderedModules = Modules
+	local OrderedModules = {}
 	
-	for i, Module in pairs(OrderedModules) do
-		local PrioritySearchResult = table.find(PriorityList, Module.Name)
-
-		if PrioritySearchResult then
-			OrderedModules[i], OrderedModules[PrioritySearchResult] = OrderedModules[PrioritySearchResult], OrderedModules[i]
-		end
+	for i, ModuleName in pairs(PriorityList) do
+		table.insert(OrderedModules, Modules[ModuleName])
 	end
 
 	return OrderedModules
@@ -97,14 +93,14 @@ local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 	shared.Modules = {}
 	
 	if PriorityList then
+		print(AllModules)
 		AllModules = LoadOrderedModules(AllModules, PriorityList)
+		print(AllModules)
 	end
 
 	for i, ModulePointer in pairs(AllModules) do
-		task.spawn(function()
-			shared.Modules[ModulePointer.Name] = require(ModulePointer)
-			InitializeModule(shared.Modules[ModulePointer.Name])
-		end)
+		shared.Modules[ModulePointer.Name] = require(ModulePointer)
+		InitializeModule(shared.Modules[ModulePointer.Name])
 	end
 
 	return shared.Modules
