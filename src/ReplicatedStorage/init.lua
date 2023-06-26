@@ -91,14 +91,16 @@ end
 local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 	local AllModules = GetModules(ModuleContainer)
 	shared.Modules = {}
-	
+
 	if PriorityList then
 		AllModules = LoadOrderedModules(AllModules, PriorityList)
 	end
 
 	for i, ModulePointer in pairs(AllModules) do
-		shared.Modules[ModulePointer.Name] = require(ModulePointer)
-		InitializeModule(shared.Modules[ModulePointer.Name])
+		task.spawn(function()
+			shared.Modules[ModulePointer.Name] = require(ModulePointer)
+			InitializeModule(shared.Modules[ModulePointer.Name])
+		end)
 	end
 
 	return shared.Modules
@@ -143,7 +145,7 @@ function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
 	))
 
 	LoadModules(ModuleContainer, PriorityList)
-	shared.Modules = LockMetatable(shared.Modules)
+	shared.Modules = shared.Modules
 end
 
 
