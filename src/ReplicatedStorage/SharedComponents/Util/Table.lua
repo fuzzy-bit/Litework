@@ -4,31 +4,41 @@ local Table = {}
 
 
 --PUBLIC FUNCTIONS--
-function Table.Shuffle(InputTable)
-	local OutputTable = {}
+function Table.Shuffle(Input)
+	local Output = {}
 
-	for Key = #InputTable, 1, -1 do
+	for Key = #Input, 1, -1 do
 		local RandomPosition = math.random(1, Key)
 
-		InputTable[Key], InputTable[RandomPosition] = InputTable[RandomPosition], InputTable[Key]
-		table.insert(OutputTable, InputTable[Key])
+		Input[Key], Input[RandomPosition] = Input[RandomPosition], Input[Key]
+		table.insert(Output, Input[Key])
 	end
 
-	return OutputTable
+	return Output
 end
 
 function Table.DeepCopy(Input)
-	local Copy = {}
+	local Output = {}
 
 	for Key, Value in pairs(Input) do
 		if type(Value) == "table" then
-			Copy[Key] = Table.DeepCopy(Value)
+			Output[Key] = Table.DeepCopy(Value)
 		else
-			Copy[Key] = Value
+			Output[Key] = Value
 		end
 	end
 
-	return Copy
+	return Output
+end
+
+function Table.Reverse(Input)
+	local Output = {}
+
+	for Key = #Input, 1, -1 do
+		Output[#Input - Key + 1] = Input[Key]
+	end
+
+	return Output
 end
 
 function Table.Reconcile(Target, Template)
@@ -48,29 +58,29 @@ function Table.Reconcile(Target, Template)
 end
 
 function Table.Merge(...)
-	local Result = {}
+	local Output = {}
 
 	for i, TableToMerge in ipairs({...}) do
 		if type(TableToMerge) == "table" then
 			for Key, Value in pairs(TableToMerge) do
-				Result[Key] = Value
+				Output[Key] = Value
 			end
 		end
 	end
 
-	return Result
+	return Output
 end
 
 function Table.MergeDictionaries(...)
-	local Result = {}
+	local Output = {}
 
 	for i, Dictionary in pairs({...}) do
 		for Index, Value in pairs(Dictionary) do
-			Result[Index] = Value
+			Output[Index] = Value
 		end
 	end
 
-	return Result
+	return Output
 end
 
 
