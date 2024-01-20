@@ -3,7 +3,7 @@ gitSourceBranch = "master"
 
 
 [[classOrder]]
-classes = ["Litework", "Globals"]
+classes = ["Litework"]
 
 [[classOrder]]
 section = "Network"
@@ -11,7 +11,7 @@ classes = ["Network", "Communicator"]
 
 [[classOrder]]
 section = "Vendor"
-classes = ["VendorShared", "VendorServer", "Signal"]
+classes = ["Signal"]
 
 
 [docusaurus]
