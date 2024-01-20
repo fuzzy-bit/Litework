@@ -63,7 +63,7 @@ function Table.Merge(...)
 	for i, TableToMerge in ipairs({...}) do
 		if type(TableToMerge) == "table" then
 			for Key, Value in pairs(TableToMerge) do
-				Output[Key] = Value
+				Output[#Output + 1] = Value
 			end
 		end
 	end

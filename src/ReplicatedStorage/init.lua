@@ -14,7 +14,6 @@ local RunService = game:GetService("RunService")
 
 
 --MODULES--
-local SharedFunctions = require(script.SharedFunctions)
 local SharedComponents = require(script.SharedComponents)
 local SharedVendorComponents = require(script.Vendor)
 local LiteworkServer = require(script.LoadServer)
@@ -22,38 +21,11 @@ local LiteworkServer = require(script.LoadServer)
 
 
 --PUBLIC VARIABLES--
-Litework.Version = "0.1.5-alpha" -- FOLLOWS SEMVER
+Litework.Version = "0.1.6-alpha" -- FOLLOWS SEMVER
 
 
 
 --PRIVATE FUNCTIONS--
-local function MergeDictionaries(...)
-	local Result = {}
-
-	for i, Dictionary in pairs({...}) do
-		for Index, Value in pairs(Dictionary) do
-			Result[Index] = Value
-		end
-	end
-
-	return Result
-end
-
-local function GetFromServer(Index)
-	if LiteworkServer then
-		return LiteworkServer[Index]
-	end
-
-	return {}
-end
-
-local function LockMetatable(Index: {}, RealTable)
-	return setmetatable(RealTable or {}, {
-		__metatable = "This metatable is locked",
-		__index = Index
-	})
-end
-
 local function InitializeModule(Module)
 	if Module["Init"] then
 		if type(Module["Init"]) == "function" then
@@ -126,23 +98,7 @@ end
 	@param PriorityList {}? -- A table containing names (strings) of modules to load in order.
 ]=]
 function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
-	local LoadedModules
-	local LoadedComponents
-
-	shared.GetModule = SharedFunctions.GetModule
-	shared.GetComponent = SharedFunctions.GetComponent
-	shared.GetVendorComponent = SharedFunctions.GetVendorComponent
-	shared.VendorComponents = LockMetatable(MergeDictionaries(
-		SharedVendorComponents,
-		GetFromServer("Vendor")
-	))
-
-	LoadedComponents = SharedComponents:Load()
-
-	shared.Components = LockMetatable(MergeDictionaries(
-		LoadedComponents,
-		GetFromServer("Components")
-	))
+	SharedComponents:Load()
 
 	LoadModules(ModuleContainer, PriorityList)
 	shared.Modules = shared.Modules
