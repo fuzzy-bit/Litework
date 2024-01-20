@@ -17,7 +17,7 @@ local ServerStorage = game:GetService("ServerStorage")
 
 
 --MODULES--
-local Signal = shared.GetVendorComponent("Signal")
+local Signal = require(script.Parent.Parent.Signal)
 
 
 

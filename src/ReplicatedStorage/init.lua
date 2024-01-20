@@ -7,21 +7,24 @@ local Litework = {}
 
 
 
---SERVICES--
-local ServerStorage = game:GetService("ServerStorage")
-local RunService = game:GetService("RunService")
-
-
-
---MODULES--
-local SharedComponents = require(script.SharedComponents)
-local SharedVendorComponents = require(script.Vendor)
-local LiteworkServer = require(script.LoadServer)
+--PRIVATE VARIABLES--
+local ComponentOrder = {
+	"Signal",
+	"Object",
+	"Util",
+	"PlayerHandler",
+	"Network",
+	"RobloxApi"
+}
 
 
 
 --PUBLIC VARIABLES--
-Litework.Version = "0.1.6-alpha" -- FOLLOWS SEMVER
+Litework.Version = "0.2.0-alpha" -- FOLLOWS SEMVER
+
+Litework.Loaded = false
+Litework.Components = {}
+Litework.Modules = {}
 
 
 
@@ -62,7 +65,6 @@ end
 
 local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 	local AllModules = GetModules(ModuleContainer)
-	shared.Modules = {}
 
 	if PriorityList then
 		AllModules = LoadOrderedModules(AllModules, PriorityList)
@@ -70,12 +72,12 @@ local function LoadModules(ModuleContainer: Instance, PriorityList: {}?): {}
 
 	for i, ModulePointer in pairs(AllModules) do
 		task.spawn(function()
-			shared.Modules[ModulePointer.Name] = require(ModulePointer)
-			InitializeModule(shared.Modules[ModulePointer.Name])
+			Litework.Modules[ModulePointer.Name] = require(ModulePointer)
+			InitializeModule(Litework.Modules[ModulePointer.Name])
 		end)
 	end
 
-	return shared.Modules
+	return Litework.Modules
 end
 
 
@@ -98,10 +100,19 @@ end
 	@param PriorityList {}? -- A table containing names (strings) of modules to load in order.
 ]=]
 function Litework:Load(ModuleContainer: Instance, PriorityList: {}?)
-	SharedComponents:Load()
+	if not Litework.Loaded then
+		for i, ComponentName in pairs(ComponentOrder) do
+			if script:FindFirstChild(ComponentName) then
+				local ComponentModule = script:FindFirstChild(ComponentName)
+				Litework.Components[ComponentName] = require(ComponentModule)
+			else
+				error(string.format("%s is not a valid component!", ComponentName))
+			end
+		end
 
-	LoadModules(ModuleContainer, PriorityList)
-	shared.Modules = shared.Modules
+		LoadModules(ModuleContainer, PriorityList)
+		Litework.Loaded = true
+	end
 end
 
 
