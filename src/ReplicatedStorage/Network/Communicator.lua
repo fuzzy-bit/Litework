@@ -25,7 +25,6 @@ local Signal = require(script.Parent.Parent.Signal)
 local InstanceLocation = game.ReplicatedStorage
 local ServerBindableLocation = ServerStorage
 
-local Randomizer = Random.new(tick())
 local ContextString = RunService:IsServer() and "Server" or "Client"
 
 local Errors = {
@@ -74,6 +73,8 @@ function Communicator.new(Name: string, Mode: string, ChannelType: string, Chann
         Mode = Mode,
         Type = ChannelType,
 
+        LastChannel = 1,
+
         Channels = {},
         OnEvent = Signal.new(),
 
@@ -100,11 +101,20 @@ function Communicator.new(Name: string, Mode: string, ChannelType: string, Chann
     return self
 end
 
+function Communicator:GetNewChannelId()
+    self.LastChannel += 1
+
+    if self.LastChannel > #self.Channels then
+        self.LastChannel = 1
+    end
+
+    return self.LastChannel
+end
+
 -- RemoteEvent
 function Communicator:FireAllClients(...)
-    if RunService:IsServer() then   
-        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-        self.Channels[ChannelId]:FireAllClients(...)
+    if RunService:IsServer() then
+        self.Channels[self:GetNewChannelId()]:FireAllClients(...)
     else
         error(Errors.ServerFromClient)
     end
@@ -112,8 +122,7 @@ end
 
 function Communicator:FireClient(Player: Player, ...)
     if RunService:IsServer() then   
-        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-        self.Channels[ChannelId]:FireClient(Player, ...)
+        self.Channels[self:GetNewChannelId()]:FireClient(Player, ...)
     else
         error(Errors.ServerFromClient)
     end
@@ -121,8 +130,7 @@ end
 
 function Communicator:FireServer(...)
     if RunService:IsClient() then   
-        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-        self.Channels[ChannelId]:FireServer(...)
+        self.Channels[self:GetNewChannelId()]:FireServer(...)
     else
         error(Errors.ClientFromServer)
     end
@@ -130,15 +138,13 @@ end
 
 -- BindableEvent
 function Communicator:Fire(...)
-    local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-    self.Channels[ChannelId]:Fire(...)
+    self.Channels[self:GetNewChannelId()]:Fire(...)
 end
 
 --RemoteFunction
 function Communicator:InvokeServer(...)
     if RunService:IsClient() then
-        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-        return self.Channels[ChannelId]:InvokeServer(...)
+        return self.Channels[self:GetNewChannelId()]:InvokeServer(...)
     else
         error(Errors.ClientFromServer)
     end
@@ -146,8 +152,7 @@ end
 
 function Communicator:InvokeClient(...)
     if RunService:IsServer() then
-        local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-        return self.Channels[ChannelId]:InvokeClient(...)
+        return self.Channels[self:GetNewChannelId()]:InvokeClient(...)
     else
         error(Errors.ServerFromClient)
     end
@@ -155,8 +160,7 @@ end
 
 -- BindableFunction
 function Communicator:Invoke(...)
-    local ChannelId = Randomizer:NextInteger(1, #self.Channels)
-    return self.Channels[ChannelId]:Invoke(...)
+    return self.Channels[self:GetNewChannelId()]:Invoke(...)
 end
 
 function Communicator:OnInvoke(InvokeFunction)
