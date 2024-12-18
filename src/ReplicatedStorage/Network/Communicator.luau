@@ -81,8 +81,8 @@ function Communicator.new(Name: string, Mode: string, ChannelType: string, Chann
         RootFolder = nil
     }, Communicator)
 
-    local ChannelAmount = ChannelAmount or 1
     local ModeFolder = InstanceLocation.Communicators:FindFirstChild(Mode)
+    ChannelAmount = ChannelAmount or 1
 
     if Mode == "Bindable" and RunService:IsServer() then
         ModeFolder = ServerBindableLocation.BindableCommunicators

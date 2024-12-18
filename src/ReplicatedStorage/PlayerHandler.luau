@@ -75,6 +75,12 @@ end
 
 
 --PUBLIC FUNCTIONS--
+function PlayerHandler:SetFlag(Name, Value)
+	Flags[Name] = Value
+	
+	return PlayerHandler.SetFlag
+end
+
 function PlayerHandler:Init()
 	Players.CharacterAutoLoads = Flags.CharacterAutoLoads
 	Players.RespawnTime = Flags.RespawnTime
